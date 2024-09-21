@@ -4,9 +4,15 @@ import { useState, useEffect } from 'react';
 import useTaskStore from '../../store/useTaskStore';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
-import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import useAuthStore from '../../store/useAuthStore';
+import dynamic from 'next/dynamic';
+import LoadingSpinner from '../common/LoadingSpinner';
+
+// Cargar TaskForm de forma perezosa
+const TaskForm = dynamic(() => import('./TaskForm'), {
+  loading: () => <LoadingSpinner />,  // Texto mientras carga el formulario (opcional)
+});
 
 const Tasks = () => {
   const { tasks, addTask, updateTask, deleteTask, fetchTasks } = useTaskStore();
