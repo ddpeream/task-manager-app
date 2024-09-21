@@ -1,24 +1,37 @@
-// src/pages/tasks.jsx
 "use client";
 
-import { useState } from 'react';
-import useTaskStore from '../services/taskService';
-import Navbar from '../components/common/Navbar';
-import Footer from '../components/common/Footer';
-import TaskForm from '../components/tasks/TaskForm';
-import TaskList from '../components/tasks/TaskList';
+import { useState, useEffect } from 'react';
+import useTaskStore from '../../store/useTaskStore';
+import Navbar from '../common/Navbar';
+import Footer from '../common/Footer';
+import TaskForm from './TaskForm';
+import TaskList from './TaskList';
+import useAuthStore from '../../store/useAuthStore';
 
 const Tasks = () => {
   const { tasks, addTask, updateTask, deleteTask, fetchTasks } = useTaskStore();
+  const { getUser } = useAuthStore();
   const [newTask, setNewTask] = useState({ title: '', description: '', status: 'Pendiente' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState(null);
 
-  if (tasks.length === 0) {
-    fetchTasks();
-  }
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUser();
+      setUser(userData);
+    };
+
+    fetchUser();
+  }, [getUser]);
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      fetchTasks();
+    }
+  }, [tasks, fetchTasks]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -34,11 +47,11 @@ const Tasks = () => {
     deleteTask(taskId);
   };
 
-  const handleFormSubmit = (task) => {
+  const handleFormSubmit = async (task) => {
     if (isEditing) {
-      updateTask({ ...task, id: currentTask.id });
+      await updateTask({ ...task, id: currentTask.id });
     } else {
-      addTask(task);
+      await addTask({ ...task, user: user.id });
     }
     setIsModalOpen(false);
     setIsEditing(false);
@@ -53,7 +66,7 @@ const Tasks = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <div className="flex flex-col items-center p-8 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 mt-16">
+      <div className="flex flex-col items-center p-8 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 flex-grow overflow-y-auto mt-16">
         <h1 className="font-extrabold text-5xl mb-12 text-gray-900 tracking-tight shadow-sm">Task Manager</h1>
 
         <input
@@ -64,7 +77,11 @@ const Tasks = () => {
           className="mb-8 w-full max-w-xl p-4 border-2 border-gray-300 rounded-lg shadow-md focus:outline-none focus:border-blue-500 transition duration-300 text-black"
         />
 
-        <TaskList tasks={tasks} searchTerm={searchTerm} onEdit={handleEdit} onDelete={handleDelete} />
+        {tasks.length === 0 ? (
+          <p className="text-gray-700 text-lg">No tienes tareas, vamos, ¡crea una nueva!</p>
+        ) : (
+          <TaskList tasks={tasks} searchTerm={searchTerm} onEdit={handleEdit} onDelete={handleDelete} />
+        )}
 
         <button
           onClick={() => setIsModalOpen(true)}

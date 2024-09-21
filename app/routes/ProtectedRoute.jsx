@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';  // Usa next/navigation en lugar de next/router
 import useAuthStore from '../store/useAuthStore';  // Hook para gestionar la autenticación
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const ProtectedRoute = ({ children }) => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
   }, [isAuthenticated, loading, router, isClient]);
 
   if (loading || !isClient) {
-    return <p>Loading...</p>;  // Mostrar un mensaje mientras se carga el estado del cliente o autenticación
+    return <LoadingSpinner />;  // Mostrar el spinner mientras se carga el estado del cliente o autenticación
   }
 
   if (!isAuthenticated && isClient) {

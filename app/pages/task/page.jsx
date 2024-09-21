@@ -1,6 +1,6 @@
 // src/pages/task/index.jsx
 import ProtectedRoute from '../../routes/ProtectedRoute';  // Protege la ruta
-import Tasks from '../../pages/task';  // Importa el componente de tareas
+import Tasks from '../../components/tasks/task';  // Importa el componente de tareas
 
 const TaskPageWrapper = () => {
     return (

@@ -1,7 +1,7 @@
 // src/services/loginService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/auth';
+const API_URL = 'https://todo-backend-production-4086.up.railway.app/auth';
 
 const login = async (email, password) => {
   try {
